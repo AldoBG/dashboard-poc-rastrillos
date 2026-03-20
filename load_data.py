@@ -1,20 +1,18 @@
-import os
+import streamlit as st
 from azure.storage.blob import BlobServiceClient
 import pandas as pd
-from dotenv import load_dotenv
-import streamlit as st
-
-load_dotenv()
+from io import StringIO
 
 @st.cache_data(ttl=60)
 def load_csv_from_blob():
     """Descarga CSV desde Azure Blob Storage"""
     
-    connection_string = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-    container_name = os.getenv('CONTAINER_NAME')
-    blob_name = os.getenv('BLOB_NAME')
-    
     try:
+        # En Streamlit Cloud usar st.secrets
+        connection_string = st.secrets["AZURE_STORAGE_CONNECTION_STRING"]
+        container_name = st.secrets["CONTAINER_NAME"]
+        blob_name = st.secrets["BLOB_NAME"]
+        
         blob_service_client = BlobServiceClient.from_connection_string(connection_string)
         blob_client = blob_service_client.get_blob_client(
             container=container_name, 
@@ -24,9 +22,7 @@ def load_csv_from_blob():
         blob_data = blob_client.download_blob()
         csv_string = blob_data.readall().decode('utf-8')
         
-        from io import StringIO
         df = pd.read_csv(StringIO(csv_string))
-        
         df['fecha_procesamiento'] = pd.to_datetime(df['fecha_procesamiento'])
         
         return df
