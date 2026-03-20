@@ -1,8 +1,8 @@
+from load_data import load_csv_from_blob
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
-from load_data import load_csv_from_blob
+import plotly.graph_objects as go 
 
 st.set_page_config(
     page_title="PoC Rastrillos - Dashboard",
